@@ -7,41 +7,46 @@
   },
   "configurePresets": [
     {
-      "name": "wii-u-rel",
-      "displayName": "Wii U Release",
+      "name": "wums-base",
+      "hidden": true,
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/wii-u",
-      "toolchainFile": "$env{DEVKITPRO}/cmake/WiiU.cmake",
+      "environment": {
+        "baseBinaryDir": "${sourceDir}/build/wums"
+      },
+      "toolchainFile": "${sourceDir}/cmake/wums-toolchain.cmake"
+    },
+    {
+      "name": "wums-rel",
+      "displayName": "WUMS Release",
+      "inherits": ["wums-base"],
+      "binaryDir": "$env{baseBinaryDir}/rel",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
       }
     },
     {
-      "name": "wii-u-dbg",
-      "displayName": "Wii U Debug",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/wii-u",
-      "toolchainFile": "$env{DEVKITPRO}/cmake/WiiU.cmake",
+      "name": "wums-dbg",
+      "displayName": "WUMS Debug",
+      "inherits": ["wums-base"],
+      "binaryDir": "$env{baseBinaryDir}/dbg",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
-      "name": "wii-u-rel-dbg-info",
-      "displayName": "Wii U Release with Debug Info",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/wii-u",
-      "toolchainFile": "$env{DEVKITPRO}/cmake/WiiU.cmake",
+      "name": "wums-rel-dbg-info",
+      "displayName": "WUMS Release with Debug Info",
+      "inherits": ["wums-base"],
+      "binaryDir": "$env{baseBinaryDir}/rel-dbg-info",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       }
     },
     {
-      "name": "wii-u-rel-min-size",
-      "displayName": "Wii U Minimum Size Release",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/wii-u",
-      "toolchainFile": "$env{DEVKITPRO}/cmake/WiiU.cmake",
+      "name": "wums-rel-min-size",
+      "displayName": "WUMS Minimum Size Release",
+      "inherits": ["wums-base"],
+      "binaryDir": "$env{baseBinaryDir}/rel-min-size",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "MinSizeRel"
       }
