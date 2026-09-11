@@ -361,7 +361,7 @@ UACError UACRequest(UACChannel channel, UACRequestData *request) {
     }
     request->returnedSize = msg->response.request.actualSize;
     if (isReadRequest) {
-        std::memcpy(request->buffer, msg->vecs[1].vaddr, request->size);
+        std::memcpy(request->buffer, msg->vecs[1].vaddr, request->returnedSize);
     }
     FreeIpcMsg(msg);
 
