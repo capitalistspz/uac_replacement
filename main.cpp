@@ -265,9 +265,12 @@ static void audio_req_callback(IOSError error, void *ipcMsg) {
     auto& desc = inst.descBuffer[descIndex];
     DCInvalidateRange(&desc, sizeof(UACISODesc));
 
-    for (auto* buf : desc.sampleBufs) {
-        assert(buf != nullptr);
+    for (auto i = 0u; i < std::size(desc.bufInfo); ++i) {
+        auto* buf = desc.sampleBufs[i];
+        auto& info = desc.bufInfo[i];
+        DCInvalidateRange(buf, info.sizeBytes);
     }
+
     *current->outDesc = &desc;
     OSSignalEvent(current->event);
     inst.gaInfoQueue.dequeue();

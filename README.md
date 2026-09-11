@@ -1,7 +1,5 @@
 # UAC Replacement Module
 
-**Mic output doesn't work properly yet**
-
 A reimplementation of the GamePad audio library `uac.rpl`, which underlies `mic.rpl`.
 
 # Building
