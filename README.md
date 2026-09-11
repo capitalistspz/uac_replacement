@@ -2,12 +2,13 @@
 
 A reimplementation of the GamePad audio library `uac.rpl`, which underlies `mic.rpl`.
 
-# Building
 ## Dependencies
 https://github.com/wiiu-env/WiiUModuleSystem
 
+## Building
 ```bash
 cmake --preset wums-rel-dbg-info
 cd build/wums/rel-dbg-info
 cmake --build .
 ```
+All presets can be found via `cmake --list-presets`
