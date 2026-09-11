@@ -127,7 +127,7 @@ struct uac_ipc_txn {
     IOSVec vecs[3];
     WUT_PADDING_BYTES(92);
     uac_ipc_request request;
-    WUT_PADDING_BYTES(172);
+    std::byte bufferArea[172];
     uac_ipc_response response;
     WUT_PADDING_BYTES(56);
 };

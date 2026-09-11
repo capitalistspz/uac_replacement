@@ -52,13 +52,12 @@ namespace {
     IPCBufPool *pool;
     std::optional<std::array<UACInstance, 2> > instances;
 
-    void FreeIpcMsg(uac_ipc_txn* p) {
+    using uac_ipc_txn_ptr = std::unique_ptr<uac_ipc_txn, decltype([](uac_ipc_txn* p) {
         if (pool && p)
-            IPCBufPoolFree(pool, p);
-    }
+        IPCBufPoolFree(pool, p); })>;
 
-    [[gnu::malloc(FreeIpcMsg)]]
-    uac_ipc_txn * AllocateIpcMsg(UACError &outError) {
+
+    uac_ipc_txn_ptr AllocateIpcMsg(UACError &outError) {
         if (!pool) {
             outError = UAC_ERROR_IPC_POOL_UNINITIALIZED;
             return nullptr;
@@ -70,8 +69,10 @@ namespace {
         }
         outError = UAC_SUCCESS;
         std::memset(msg, 0, sizeof(uac_ipc_txn));
-        return msg;
+        return uac_ipc_txn_ptr(msg);
     }
+
+
 }
 
 static UACError uac_close(UACChannel channel, bool acquireLock) {
@@ -128,7 +129,7 @@ static UACError uac_send_ipc_open_msg(UACInstance &inst, const UACIpcWorkMemory 
     msg->vecs[2].len = workMem->isoDescBufferSizeBytes;
 
     const auto res = IOS_Ioctlv(inst.iosHandle, +uac_ipc_request_id::Open, 1, 2, msg->vecs);
-    FreeIpcMsg(msg);
+
     if (res != IOS_ERROR_OK) {
         LOG_WARN("Open IOCTL failed: %d", res);
         return UAC_ERROR_IOCTL_FAILED;
@@ -214,14 +215,13 @@ UACError UACFreeISODesc(UACChannel channel, UACISODesc *desc) {
     msg->vecs[0].vaddr = &msg->request;
     msg->vecs[0].len = sizeof(msg->request);
     const auto err = IOS_Ioctlv(inst.iosHandle, +uac_ipc_request_id::FreeIsoDesc, 1, 0, msg->vecs);
-    FreeIpcMsg(msg);
     if (err)
         return UAC_ERROR_IOCTL_FAILED;
     return UAC_SUCCESS;
 }
 
 static void audio_req_callback(IOSError error, void *ipcMsg) {
-    auto msg = static_cast<uac_ipc_txn *>(ipcMsg);
+    auto msg = uac_ipc_txn_ptr(static_cast<uac_ipc_txn *>(ipcMsg));
     if (!msg) {
         LOG_WARN("ipcMsg is NULL");
         return;
@@ -239,26 +239,22 @@ static void audio_req_callback(IOSError error, void *ipcMsg) {
             OSSignalEvent(current->event);
             inst.gaInfoQueue.dequeue();
         }
-        FreeIpcMsg(msg);
         return;
     }
 
     if (inst.iosHandle < 0) {
         LOG_WARN("UAC already closed");
-        FreeIpcMsg(msg);
         return;
     }
 
     auto current = inst.gaInfoQueue.get_current();
     if (!current) {
         LOG_WARN("Failed to get GA info");
-        FreeIpcMsg(msg);
         return;
     }
 
     if (!inst.descBuffer) {
         LOG_WARN("ISO descriptor buffer is NULL");
-        FreeIpcMsg(msg);
         return;
     }
 
@@ -274,7 +270,6 @@ static void audio_req_callback(IOSError error, void *ipcMsg) {
     *current->outDesc = &desc;
     OSSignalEvent(current->event);
     inst.gaInfoQueue.dequeue();
-    FreeIpcMsg(msg);
 }
 
 UACError UACGetAudio(UACChannel channel, OSEvent *event, UACISODesc **outDesc) {
@@ -301,14 +296,14 @@ UACError UACGetAudio(UACChannel channel, OSEvent *event, UACISODesc **outDesc) {
     inst.audioRequestCount += 1;
 
     const auto res = IOS_IoctlvAsync(inst.iosHandle, +uac_ipc_request_id::GetAudio, 1, 1, msg->vecs, audio_req_callback,
-                                     msg);
+                                     msg.get());
 
     if (res != IOS_ERROR_OK) {
-        FreeIpcMsg(msg);
         inst.audioRequestCount -= 1;
         inst.gaInfoQueue.undo_enqueue();
         return UAC_ERROR_IOCTL_FAILED;
     }
+    cz::util::Discard(msg.release());
     return UAC_SUCCESS;
 }
 
@@ -338,8 +333,8 @@ UACError UACRequest(UACChannel channel, UACRequestData *request) {
 
     msg->request.u.request.requestOpt = request->opt;
     msg->request.u.request.unk = request->unk;
-    auto intermediaryBuffer = reinterpret_cast<void *>(
-        (reinterpret_cast<uintptr_t>(msg) + 255) & ~static_cast<uintptr_t>(63));
+    
+    auto intermediaryBuffer = cz::util::align_ptr_up(msg->bufferArea, 64);
     msg->vecs[0].vaddr = &msg->request;
     msg->vecs[0].len = sizeof(msg->request);
     msg->request.u.request.inputSize = request->size;
