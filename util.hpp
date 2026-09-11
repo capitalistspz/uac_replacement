@@ -3,6 +3,8 @@
 #pragma once
 #include <type_traits>
 #include <cstdint>
+#include <coreinit/mutex.h>
+
 namespace cz {
     namespace cos_util {
         class cos_conditional_lock {
@@ -35,10 +37,10 @@ namespace cz {
             }
         }
 
-        inline void* align_ptr_up(void* p, uint32_t alignment) {
+        inline void *align_ptr_up(void *p, uint32_t alignment) {
             auto val = reinterpret_cast<uintptr_t>(p);
             auto alignedVal = (val + alignment) & static_cast<uintptr_t>(-static_cast<intptr_t>(alignment));
-            return reinterpret_cast<void*>(alignedVal);
+            return reinterpret_cast<void *>(alignedVal);
         }
     }
 }

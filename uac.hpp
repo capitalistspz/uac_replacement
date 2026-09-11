@@ -23,12 +23,14 @@ typedef enum UACError {
     UAC_ERROR_INVALID_ARG = -1638430,
     UAC_SUCCESS = 0
 } UACError;
+
 WUT_CHECK_SIZE(UACError, 4);
 
 typedef enum UACChannel {
     UAC_CHANNEL_0,
     UAC_CHANNEL_1
 } UACChannel;
+
 WUT_CHECK_SIZE(UACChannel, 4);
 
 
@@ -73,6 +75,7 @@ struct UACSampleBufInfo {
     uint16_t frameSlipMs;
     uint16_t sizeBytes;
 };
+
 WUT_CHECK_OFFSET(UACSampleBufInfo, 0x00, frameSlipMs);
 WUT_CHECK_OFFSET(UACSampleBufInfo, 0x02, sizeBytes);
 WUT_CHECK_SIZE(UACSampleBufInfo, 0x04);
@@ -80,16 +83,22 @@ WUT_CHECK_SIZE(UACSampleBufInfo, 0x04);
 struct UACISODesc {
     //! May just be padding, seem to always be zero
     WUT_UNKNOWN_BYTES(0x20);
-    void* sampleBufs[0x08];
+    void *sampleBufs[0x08];
     UACSampleBufInfo bufInfo[0x08];
 };
+
 WUT_CHECK_OFFSET(UACISODesc, 0x20, sampleBufs);
 WUT_CHECK_OFFSET(UACISODesc, 0x40, bufInfo);
 WUT_CHECK_SIZE(UACISODesc, 0x60);
 
 UACError UACInit();
+
 UACError UACOpen(UACChannel channel, const UACIpcWorkMemory *workMem);
+
 UACError UACClose(UACChannel channel);
+
 UACError UACFreeISODesc(UACChannel channel, UACISODesc *desc);
+
 UACError UACGetAudio(UACChannel channel, OSEvent *event, UACISODesc **outDesc);
+
 UACError UACRequest(UACChannel channel, UACRequestData *request);

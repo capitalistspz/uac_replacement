@@ -52,9 +52,10 @@ namespace {
     IPCBufPool *pool;
     std::optional<std::array<UACInstance, 2> > instances;
 
-    using uac_ipc_txn_ptr = std::unique_ptr<uac_ipc_txn, decltype([](uac_ipc_txn* p) {
+    using uac_ipc_txn_ptr = std::unique_ptr<uac_ipc_txn, decltype([](uac_ipc_txn *p) {
         if (pool && p)
-        IPCBufPoolFree(pool, p); })>;
+            IPCBufPoolFree(pool, p);
+    })>;
 
 
     uac_ipc_txn_ptr AllocateIpcMsg(UACError &outError) {
@@ -71,8 +72,6 @@ namespace {
         std::memset(msg, 0, sizeof(uac_ipc_txn));
         return uac_ipc_txn_ptr(msg);
     }
-
-
 }
 
 static UACError uac_close(UACChannel channel, bool acquireLock) {
@@ -258,12 +257,12 @@ static void audio_req_callback(IOSError error, void *ipcMsg) {
         return;
     }
 
-    auto& desc = inst.descBuffer[descIndex];
+    auto &desc = inst.descBuffer[descIndex];
     DCInvalidateRange(&desc, sizeof(UACISODesc));
 
     for (auto i = 0u; i < std::size(desc.bufInfo); ++i) {
-        auto* buf = desc.sampleBufs[i];
-        auto& info = desc.bufInfo[i];
+        auto *buf = desc.sampleBufs[i];
+        auto &info = desc.bufInfo[i];
         DCInvalidateRange(buf, info.sizeBytes);
     }
 
@@ -333,7 +332,7 @@ UACError UACRequest(UACChannel channel, UACRequestData *request) {
 
     msg->request.u.request.requestOpt = request->opt;
     msg->request.u.request.unk = request->unk;
-    
+
     auto intermediaryBuffer = cz::util::align_ptr_up(msg->bufferArea, 64);
     msg->vecs[0].vaddr = &msg->request;
     msg->vecs[0].len = sizeof(msg->request);
@@ -356,14 +355,16 @@ UACError UACRequest(UACChannel channel, UACRequestData *request) {
         iosError = IOS_Ioctlv(inst.iosHandle, +uac_ipc_request_id::MiscRequest, 2, 1, msg->vecs);
 
     if (iosError != IOS_ERROR_OK) {
-        LOG_WARN("Request(id: 0x%x, opt: 0x%x unk: 0x%x, size: %u) -> error=%d", request->id, request->opt, request->unk, request->size, iosError);
+        LOG_WARN("Request(id: 0x%x, opt: 0x%x unk: 0x%x, size: %u) -> error=%d", request->id, request->opt,
+                 request->unk, request->size, iosError);
         return UAC_ERROR_IOCTL_FAILED;
     }
     request->returnedSize = msg->response.request.actualSize;
     if (isReadRequest) {
         std::memcpy(request->buffer, msg->vecs[1].vaddr, request->returnedSize);
     }
-    LOG_WARN("Request(id: 0x%x, opt: 0x%x unk: 0x%x, size: %u) -> size=%u", request->id, request->opt, request->unk, request->size, request->returnedSize);
+    LOG_WARN("Request(id: 0x%x, opt: 0x%x unk: 0x%x, size: %u) -> size=%u", request->id, request->opt, request->unk,
+             request->size, request->returnedSize);
 
     return UAC_SUCCESS;
 }

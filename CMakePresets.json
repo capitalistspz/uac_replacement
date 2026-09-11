@@ -18,7 +18,9 @@
     {
       "name": "wums-rel",
       "displayName": "WUMS Release",
-      "inherits": ["wums-base"],
+      "inherits": [
+        "wums-base"
+      ],
       "binaryDir": "$env{baseBinaryDir}/rel",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
@@ -27,7 +29,9 @@
     {
       "name": "wums-dbg",
       "displayName": "WUMS Debug",
-      "inherits": ["wums-base"],
+      "inherits": [
+        "wums-base"
+      ],
       "binaryDir": "$env{baseBinaryDir}/dbg",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
@@ -36,7 +40,9 @@
     {
       "name": "wums-rel-dbg-info",
       "displayName": "WUMS Release with Debug Info",
-      "inherits": ["wums-base"],
+      "inherits": [
+        "wums-base"
+      ],
       "binaryDir": "$env{baseBinaryDir}/rel-dbg-info",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo"
@@ -45,7 +51,9 @@
     {
       "name": "wums-rel-min-size",
       "displayName": "WUMS Minimum Size Release",
-      "inherits": ["wums-base"],
+      "inherits": [
+        "wums-base"
+      ],
       "binaryDir": "$env{baseBinaryDir}/rel-min-size",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "MinSizeRel"

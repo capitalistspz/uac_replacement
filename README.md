@@ -1,5 +1,4 @@
 # UAC Replacement Module
-
 A reimplementation of the GamePad audio library `uac.rpl`, which underlies `mic.rpl`.
 
 ## Dependencies
