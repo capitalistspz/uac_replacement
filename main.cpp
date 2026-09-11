@@ -356,14 +356,14 @@ UACError UACRequest(UACChannel channel, UACRequestData *request) {
         iosError = IOS_Ioctlv(inst.iosHandle, +uac_ipc_request_id::MiscRequest, 2, 1, msg->vecs);
 
     if (iosError != IOS_ERROR_OK) {
-        FreeIpcMsg(msg);
+        LOG_WARN("Request(id: 0x%x, opt: 0x%x unk: 0x%x, size: %u) -> error=%d", request->id, request->opt, request->unk, request->size, iosError);
         return UAC_ERROR_IOCTL_FAILED;
     }
     request->returnedSize = msg->response.request.actualSize;
     if (isReadRequest) {
         std::memcpy(request->buffer, msg->vecs[1].vaddr, request->returnedSize);
     }
-    FreeIpcMsg(msg);
+    LOG_WARN("Request(id: 0x%x, opt: 0x%x unk: 0x%x, size: %u) -> size=%u", request->id, request->opt, request->unk, request->size, request->returnedSize);
 
     return UAC_SUCCESS;
 }
