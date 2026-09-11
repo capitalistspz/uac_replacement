@@ -1,0 +1,50 @@
+{
+  "version": 10,
+  "cmakeMinimumRequired": {
+    "major": 4,
+    "minor": 0,
+    "patch": 2
+  },
+  "configurePresets": [
+    {
+      "name": "wii-u-rel",
+      "displayName": "Wii U Release",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/wii-u",
+      "toolchainFile": "$env{DEVKITPRO}/cmake/WiiU.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "wii-u-dbg",
+      "displayName": "Wii U Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/wii-u",
+      "toolchainFile": "$env{DEVKITPRO}/cmake/WiiU.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "wii-u-rel-dbg-info",
+      "displayName": "Wii U Release with Debug Info",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/wii-u",
+      "toolchainFile": "$env{DEVKITPRO}/cmake/WiiU.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    },
+    {
+      "name": "wii-u-rel-min-size",
+      "displayName": "Wii U Minimum Size Release",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/wii-u",
+      "toolchainFile": "$env{DEVKITPRO}/cmake/WiiU.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "MinSizeRel"
+      }
+    }
+  ]
+}
