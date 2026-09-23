@@ -3,6 +3,10 @@ project(uac_replacement)
 
 set(CMAKE_CXX_STANDARD 26)
 
+if (NOT WUMS)
+    message(FATAL_ERROR "This project requires the WUMS toolchain")
+endif ()
+
 add_executable(uac_replacement main.cpp
     uac.hpp
     meta.cpp
